@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import time
 
 time_val = 1
+pin = 5
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(5, GPIO.OUT)
