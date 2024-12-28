@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 
@@ -65,7 +66,8 @@ class Graphics:
         self.running = True
         self.group_flag = False
         self.temporary_path = None
-        self.num_last_group = 1
+        self.color_group = []
+        # self.num_last_group = 1
 
         # rect( x_up, y_up, width, height )
         # self.electrodes_rect_list = [
@@ -82,6 +84,7 @@ class Graphics:
 
             self.electrodes_rect_list.append({"id": i, "rect": pygame.Rect((x_pos, y_pos), (self.electro_w, self.electro_h))})
             self.rect_flag_list.append(0)
+            self.color_group.append(0) # index to choose color in groups
 
             # Text to draw the id
             text = self.font_electrodes.render(str(i), 1, self.black )
@@ -129,6 +132,8 @@ class Graphics:
         self.y_store_ids_text = self.height - 50
         self.distance_ids_text = 50
 
+        self.color_group_options = [self.sky_blue, self.light_sky_blue, self.royal_blue, self.steel_blue, self.light_steel_blue, self.mint_cream, self.powder_blue]
+
     
     def number2text_store(self, id):
         '''
@@ -152,8 +157,14 @@ class Graphics:
 
         # Draw electrodes (rectangle shape)
         for rect_electro in self.electrodes_rect_list:
-            if self.rect_flag_list[rect_electro['id']] :
-                color_rect = self.sky_blue
+            id = rect_electro['id']
+            if self.rect_flag_list[id] :
+
+                if self.group_flag :
+                    # color_rect = (int((self.color_group[id])*self.sky_blue[0]), int((self.color_group[id])*self.sky_blue[1]), int((self.color_group[id])*self.sky_blue[2]))
+                    color_rect = self.color_group_options[self.color_group[id]]
+                else:
+                    color_rect = self.sky_blue
             else:
                 color_rect =  self.navajo_white
 
@@ -223,17 +234,27 @@ class Graphics:
     def group_botton(self):
         
         if self.group_flag :
-            self.num_last_group = len(self.temporary_path)             # To be able to delete the last group 
             self.path_list.append(self.temporary_path)
             self.temporary_path = []
         else: 
             self.group_flag = True
             if len(self.path_list) != 0:
                 self.temporary_path = self.path_list.copy()
-                self.num_last_group = len(self.temporary_path)          # To be able to delete the last group 
                 self.path_list = []
                 self.path_list.append(self.temporary_path)
                 self.temporary_path = []
+
+        self.color_group_update()
+
+    def color_group_update(self):
+
+        if len(self.path_list) != 0 :
+        #    random_val = random.random()
+            random_val = random.randrange(0, len(self.color_group_options))
+            ids_list = self.path_list[-1]
+
+            for id in ids_list:
+                self.color_group[id] = int(random_val)
 
 
     def delete_botton(self):
@@ -268,6 +289,7 @@ class Graphics:
 
         for i in range(0, len(self.rect_flag_list)):
             self.rect_flag_list[i] = 0                 # Change color
+            self.color_group[i] = 1
 
         self.path_text_list = []
         self.clean_map()
@@ -275,7 +297,7 @@ class Graphics:
         # Group 
         self.temporary_path = []
         self.group_flag = False
-        self.num_last_group = 1
+        
 
 
     def clean_map(self):
