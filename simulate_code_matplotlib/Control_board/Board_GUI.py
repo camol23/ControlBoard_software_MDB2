@@ -223,7 +223,7 @@ class Graphics:
     def group_botton(self):
         
         if self.group_flag :
-            self.num_last_group = len(self.temporary_path)          # To be able to delete the last group 
+            self.num_last_group = len(self.temporary_path)             # To be able to delete the last group 
             self.path_list.append(self.temporary_path)
             self.temporary_path = []
         else: 
@@ -237,14 +237,30 @@ class Graphics:
 
 
     def delete_botton(self):
+        '''
+            Remove the last element or group of electrodes selected
+        '''
 
         if len(self.path_list) != 0 :
-            id = self.path_list[-1]
-            self.rect_flag_list[id] = 0
-            self.path_list.pop()
+            
+            if self.group_flag :
+                last_group = self.path_list[-1]    
+                for id in last_group:
+                    self.rect_flag_list[id] = 0    
+                    self.path_text_list.pop()
 
-            self.path_text_list.pop()
+                self.temporary_path = []
+            else:
+                id = self.path_list[-1]
+                self.rect_flag_list[id] = 0
+
+                self.path_text_list.pop()
+            
+            self.path_list.pop()
             self.clean_map()
+
+        if len(self.path_list) == 0:
+            self.clear_botton()
         
 
     def clear_botton(self):
