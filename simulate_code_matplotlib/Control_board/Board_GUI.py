@@ -51,6 +51,7 @@ class Graphics:
         self.init_pint_electrodes_x = int(self.width/2) - int((self.num_pins_divices/2)*(self.electro_w+self.distance_between))     # (x, y) upper-left corner for the board (first electrode)
         self.init_pint_electrodes_y = int(self.height/2) - int((self.num_divices/2)*(self.electro_h+self.distance_between))
         self.electrodes_rect_list = []
+        self.rect_flag_list = []
 
         self.font_electrodes = pygame.font.Font(None, 25)
         self.electrodes_text_list = []
@@ -69,6 +70,7 @@ class Graphics:
             y_pos = row*(self.distance_between+self.electro_h) + self.init_pint_electrodes_y
 
             self.electrodes_rect_list.append({"id": i, "rect": pygame.Rect((x_pos, y_pos), (self.electro_w, self.electro_h))})
+            self.rect_flag_list.append(0)
 
             # Text to draw the id
             text = self.font_electrodes.render(str(i), 1, self.black )
@@ -103,10 +105,17 @@ class Graphics:
 
 
     def draw_board(self):
+        color_rect =  self.navajo_white
 
         # Draw electrodes (rectangle shape)
         for rect_electro in self.electrodes_rect_list:
-            pygame.draw.rect(self.map, self.navajo_white, rect_electro["rect"] )
+            if self.rect_flag_list[rect_electro['id']] :
+                color_rect = self.sky_blue
+            else:
+                color_rect =  self.navajo_white
+
+            # pygame.draw.rect(self.map, self.navajo_white, rect_electro["rect"] )
+            pygame.draw.rect(self.map, color_rect, rect_electro["rect"] )
 
         for text_electro in self.electrodes_text_list:
             # draw rect text
@@ -142,7 +151,9 @@ class Graphics:
                     if rect_electro["rect"].collidepoint(x, y):    
                         id_electro = rect_electro["id"] 
                         print("Click over electrode = ", id_electro)
+                        
                         self.path_list.append(id_electro)
+                        self.rect_flag_list[id_electro] = 1
 
                         # store the id selected to draw the text
                         self.number2text_store(id_electro)
