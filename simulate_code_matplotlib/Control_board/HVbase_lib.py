@@ -29,6 +29,9 @@ class HV513():
         self.CLK = 1                # Clock signal      (rise-up to shift data input)
         self.LE = 2                 # Latch enable      (1: Load D_in to D_out)
         self.DATA = 3               # Data to be sended to D_in (1-bit serial Output)
+        self.DATA2 = 7              # D_in 2 for the second HV
+        self.DATA3 = 8              # D_in 3 for the third HV
+        self.DATA4 = 9              # D_in 4 for the fourth HV
 
         # HV513 Sginals
         self.BL_val = 0b1               # Blank val         (0: Set Low HV - [~BL NAND Latch_Output] )
@@ -57,6 +60,13 @@ class HV513():
         self.DATA_list = [self.DATA_val]
         self.data_in = 0
 
+        self.DATA2_val = 0b0                 
+        self.DATA2_list = [self.DATA2_val]
+        self.DATA3_val = 0b0                 
+        self.DATA3_list = [self.DATA3_val]
+        self.DATA4_val = 0b0                 
+        self.DATA4_list = [self.DATA4_val]
+
 
 
     def send_sequence(self, data_list):
@@ -69,7 +79,7 @@ class HV513():
 
         '''
         for data in data_list:
-            self.send_data_debug(data)
+            self.send_data(data)
 
             time.sleep(self.time_LE)
 
@@ -189,19 +199,73 @@ class HV513():
             time.sleep(self.time_LE)
             self.vis_send_debug()
 
-        
+
+    def send_sequence_parallel_debug(self, data_list):
+
+        for data in data_list:
+            self.send_data_parallel_debug(data)
+
+            time.sleep(self.time_LE)
+            self.vis_send_debug()        
 
 
-    def send_data_debug(self, data_in):
+    def send_data_parallel_debug(self, data_in):
         '''
-            Visualization in Matplotlib
-            Send data from the LS-Bit to the MS-Bit of Data_in
-
-                Note: the LS-Bit Data_in is goint to be related
-                      with the first pin in the HV513 (HVOUT1)
+            data_in a list of 4 elements
         '''
 
         # Include turn-on signals-funtion
+
+        self.reset_stored_signals()
+
+        self.CLK_val = 0b0
+        self.LE_val = 0b0
+        self.DATA_val = 0b0
+        self.CLK_list = [self.CLK_val]              
+        self.LE_list = [self.LE_val]               
+        self.DATA_list = [self.DATA_val]
+        self.data_in = data_in
+        
+        self.DATA2_val = 0b0                 
+        self.DATA2_list = [self.DATA2_val]
+        self.DATA3_val = 0b0                 
+        self.DATA3_list = [self.DATA3_val]
+        self.DATA4_val = 0b0                 
+        self.DATA4_list = [self.DATA4_val]
+
+        data_bit = 0b0
+
+            
+        for i in range(0, 8):                              # Each chip manage 8-bit Input
+            # data_bit = data_in & 1                       # Take the first bit
+            self.DATA_val = data_in[0] & 1
+            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            self.DATA2_val = data_in[1] & 1
+            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            self.DATA_val = data_in & 1
+            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            self.DATA_val = data_in & 1
+            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            
+            self.CLK_val = 0b1 
+            self.store_signals(self.CLK, self.CLK_val)      # Load bit to the GPIO CLK 
+            data_in = data_in >> 1                          # shift data to be serialized
+            
+            time.sleep(self.clk_time)                       # Positive clk semi-cycle                 
+            self.CLK_val = 0b0
+            self.store_signals(self.CLK, self.CLK_val)      # Load bit to the GPIO CLK 
+            time.sleep(self.clk_time)                       # Positive clk semi-cycle
+        
+
+        self.LE_val = 0b1
+        self.store_signals(self.LE, self.LE_val)                # Load bit to the GPIO LE
+
+        time.sleep(self.clk_time)
+        self.LE_val = 0b0
+        self.store_signals(self.LE, self.LE_val)                # Load bit to the GPIO LE
+
+
+    def send_data_debug(self, data_in):
 
         self.reset_stored_signals()
 
@@ -243,7 +307,6 @@ class HV513():
         self.store_signals(self.LE, self.LE_val)                # Load bit to the GPIO LE
 
 
-
     def reset_stored_signals(self):
         self.DATA_list.clear()
         self.CLK_list.clear()
@@ -277,6 +340,69 @@ class HV513():
             self.DATA_list.append(self.DATA_val)
             self.CLK_list.append(self.CLK_val)
             self.LE_list.append(bit_val)
+
+    def store_signals_parallel(self, pin, bit_val):
+        
+        if pin == self.DATA :
+            for _ in range(0,2):
+                self.DATA_list.append(bit_val)
+                self.DATA2_list.append(self.DATA2_val)
+                self.DATA3_list.append(self.DATA3_val)
+                self.DATA4_list.append(self.DATA4_val)
+                
+                self.CLK_list.append(self.CLK_val)
+                self.LE_list.append(self.LE_val)
+
+        if pin == self.DATA2 :
+            for _ in range(0,2):
+                self.DATA_list.append(self.DATA_val)
+                self.DATA2_list.append(bit_val)
+                self.DATA3_list.append(self.DATA3_val)
+                self.DATA4_list.append(self.DATA4_val)
+                
+                self.CLK_list.append(self.CLK_val)
+                self.LE_list.append(self.LE_val)
+
+        if pin == self.DATA3 :
+            for _ in range(0,2):
+                self.DATA_list.append(self.DATA_val)
+                self.DATA2_list.append(self.DATA2_val)
+                self.DATA3_list.append(bit_val)
+                self.DATA4_list.append(self.DATA4_val)
+                
+                self.CLK_list.append(self.CLK_val)
+                self.LE_list.append(self.LE_val)
+
+        if pin == self.DATA4 :
+            for _ in range(0,2):
+                self.DATA_list.append(self.DATA_val)
+                self.DATA2_list.append(self.DATA2_val)
+                self.DATA3_list.append(self.DATA3_val)
+                self.DATA4_list.append(bit_val)
+                
+                self.CLK_list.append(self.CLK_val)
+                self.LE_list.append(self.LE_val)
+
+        
+        if pin == self.CLK :
+            for _ in range(0,2):
+                self.DATA_list.append(self.DATA_val)
+                self.DATA2_list.append(self.DATA2_val)
+                self.DATA3_list.append(self.DATA3_val)
+                self.DATA4_list.append(self.DATA4_val)
+                
+                self.CLK_list.append(bit_val)
+                self.LE_list.append(self.LE_val)
+        
+        if pin == self.LE :
+            for _ in range(0,2):
+                self.DATA_list.append(bit_val)
+                self.DATA2_list.append(self.DATA2_val)
+                self.DATA3_list.append(self.DATA3_val)
+                self.DATA4_list.append(self.DATA4_val)
+                
+                self.CLK_list.append(self.CLK_val)
+                self.LE_list.append(bit_val)
 
 
     def vis_send_debug(self):
