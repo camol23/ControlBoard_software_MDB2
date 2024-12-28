@@ -63,6 +63,9 @@ class Graphics:
         self.electrodes_text_list = []
 
         self.running = True
+        self.group_flag = False
+        self.temporary_path = None
+        self.num_last_group = 1
 
         # rect( x_up, y_up, width, height )
         # self.electrodes_rect_list = [
@@ -205,12 +208,33 @@ class Graphics:
                     self.clear_botton()
                 elif id_botton == "start" :
                     self.start_botton()
+                elif id_botton == "group" :
+                    self.group_botton()
                     
 
     def include_electrodes(self, id):
-
-        self.path_list.append(id)
+        
+        if self.group_flag :
+            self.temporary_path.append(id)
+        else:
+            self.path_list.append(id)
                 
+
+    def group_botton(self):
+        
+        if self.group_flag :
+            self.num_last_group = len(self.temporary_path)          # To be able to delete the last group 
+            self.path_list.append(self.temporary_path)
+            self.temporary_path = []
+        else: 
+            self.group_flag = True
+            if len(self.path_list) != 0:
+                self.temporary_path = self.path_list.copy()
+                self.num_last_group = len(self.temporary_path)          # To be able to delete the last group 
+                self.path_list = []
+                self.path_list.append(self.temporary_path)
+                self.temporary_path = []
+
 
     def delete_botton(self):
 
@@ -231,6 +255,11 @@ class Graphics:
 
         self.path_text_list = []
         self.clean_map()
+        
+        # Group 
+        self.temporary_path = []
+        self.group_flag = False
+        self.num_last_group = 1
 
 
     def clean_map(self):
