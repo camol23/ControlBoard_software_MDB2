@@ -30,6 +30,7 @@ class Graphics:
         self.mint_cream =  	(245,255,250)
         self.navajo_white = (255,222,173)
         self.spring_green = (0,255,127)
+        self.powder_blue = (176,224,230)
         # https://www.rapidtables.com/web/color/RGB_Color.html
 
         # Window
@@ -61,6 +62,8 @@ class Graphics:
         self.font_electrodes = pygame.font.Font(None, 25)
         self.electrodes_text_list = []
 
+        self.running = True
+
         # rect( x_up, y_up, width, height )
         # self.electrodes_rect_list = [
             # {"id": 0, "rect": pygame.Rect((600, 300), (100, 50))} ]                
@@ -91,23 +94,29 @@ class Graphics:
         y_pos = int(self.height/3)
         dist_bottons = 1.3*botton_height
 
-        self.bottons_rect_list.append({"id": 0, "rect": pygame.Rect((x_pos, y_pos), (botton_width, botton_height)), "color": self.light_coral})                         # Delete
-        self.bottons_rect_list.append({"id": 1, "rect": pygame.Rect((x_pos, y_pos+dist_bottons), (botton_width, botton_height)), "color": self.light_sky_blue})        # Clean
-        self.bottons_rect_list.append({"id": 2, "rect": pygame.Rect((x_pos, y_pos+2*dist_bottons), (botton_width, botton_height)), "color": self.spring_green})       # Start
-
-        text = self.font_electrodes.render("Delete", 1, self.black )
+        self.bottons_rect_list.append({"id": "group", "rect": pygame.Rect((x_pos, y_pos), (botton_width, botton_height)), "color": self.powder_blue})       # Group
+        self.bottons_rect_list.append({"id": "delete", "rect": pygame.Rect((x_pos, y_pos+dist_bottons), (botton_width, botton_height)), "color": self.light_coral})                              # Delete
+        self.bottons_rect_list.append({"id": "clear", "rect": pygame.Rect((x_pos, y_pos+2*dist_bottons), (botton_width, botton_height)), "color": self.light_sky_blue})               # Clean
+        self.bottons_rect_list.append({"id": "start", "rect": pygame.Rect((x_pos, y_pos+3*dist_bottons), (botton_width, botton_height)), "color": self.spring_green})               # Start
+        
+        text = self.font_electrodes.render("Group", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
-        text = self.font_electrodes.render("Clear", 1, self.black )
+        text = self.font_electrodes.render("Delete", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos+dist_bottons + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
-        text = self.font_electrodes.render("Start", 1, self.black )
+        text = self.font_electrodes.render("Clear", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos+2*dist_bottons + int(botton_height/2) )
+        self.bottons_text_list.append({"text": text, "text_pos": text_pos })
+
+        text = self.font_electrodes.render("START", 1, self.black )
+        text_pos = text.get_rect()
+        text_pos.center = ( x_pos+int(botton_width/2), y_pos+3*dist_bottons + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
         # Draw stored numbers (electrodes's ids)
@@ -176,31 +185,82 @@ class Graphics:
                 id_electro = rect_electro["id"] 
                 print("Click over electrode = ", id_electro)
                 
-                self.path_list.append(id_electro)
-                self.rect_flag_list[id_electro] = 1
+                self.include_electrodes(id_electro)
+                self.rect_flag_list[id_electro] = 1                 # Change color
 
                 # store the id selected to draw the text
                 self.number2text_store(id_electro)
 
 
+    def click_over_bottons(self, x, y):
+
+        for rect_botton in self.bottons_rect_list: 
+            if rect_botton["rect"].collidepoint(x, y):    
+                id_botton = rect_botton["id"] 
+                print("Botton Selected = ", id_botton)
+
+                if id_botton == "delete":
+                    self.delete_botton()
+                elif id_botton == "clear" :
+                    self.clear_botton()
+                elif id_botton == "start" :
+                    self.start_botton()
+                    
+
+    def include_electrodes(self, id):
+
+        self.path_list.append(id)
+                
+
+    def delete_botton(self):
+
+        if len(self.path_list) != 0 :
+            id = self.path_list[-1]
+            self.rect_flag_list[id] = 0
+            self.path_list.pop()
+
+            self.path_text_list.pop()
+            self.clean_map()
+        
+
+    def clear_botton(self):
+        self.path_list = []
+
+        for i in range(0, len(self.rect_flag_list)):
+            self.rect_flag_list[i] = 0                 # Change color
+
+        self.path_text_list = []
+        self.clean_map()
+
+
+    def clean_map(self):
+        self.map.fill([0, 0, 0])
+        self.map.blit(self.map_img, (0,0))
+
+
+    def start_botton(self):
+        self.running = False  
+
+
     def dectect_actions(self):
-        running = True
+        self.running = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False  
+                self.running = False  
 
             # checking if keydown event happened or not
             if event.type == pygame.KEYDOWN:
                 
                 if event.key == pygame.K_q:
-                    running = False  
+                    self.running = False  
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()                       # Get click position
 
                 self.click_over_electrodes(x, y)
+                self.click_over_bottons(x, y)
 
 
-        return running
+        return self.running
     
