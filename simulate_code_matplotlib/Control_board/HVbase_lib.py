@@ -434,7 +434,7 @@ class HV513():
 
             plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
             plt.legend(['CLK', 'DATA', 'LE'])
-            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(self.data_in[i-1])))
+            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(data[i-1])))
             plt.show() 
 
 # Global Package functions
@@ -466,7 +466,7 @@ def map_from_path(points_list):
 
 def map_from_parallel_path(points_list):
 
-    base_bin = 0b1
+    base_bin = 0b01
     output_bin = [0, 0, 0, 0]
     
     for idx in points_list:
@@ -488,7 +488,7 @@ def map_from_parallel_path(points_list):
 
     return output_bin
 
-def map_from_parallel_listpath(points_list):
+def map_from_parallel_sequence(points_list):
 
     output_sequence = []
 
