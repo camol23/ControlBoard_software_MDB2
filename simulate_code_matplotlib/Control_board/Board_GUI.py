@@ -32,6 +32,7 @@ class Graphics:
         self.navajo_white = (255,222,173)
         self.spring_green = (0,255,127)
         self.powder_blue = (176,224,230)
+        self.beige = (245,245,220)
         # https://www.rapidtables.com/web/color/RGB_Color.html
 
         # Window
@@ -69,6 +70,8 @@ class Graphics:
         self.color_group = []
         # self.num_last_group = 1
 
+        self.parallel_flag = True 
+
         # rect( x_up, y_up, width, height )
         # self.electrodes_rect_list = [
             # {"id": 0, "rect": pygame.Rect((600, 300), (100, 50))} ]                
@@ -100,29 +103,35 @@ class Graphics:
         y_pos = int(self.height/3)
         dist_bottons = 1.3*botton_height
 
-        self.bottons_rect_list.append({"id": "group", "rect": pygame.Rect((x_pos, y_pos), (botton_width, botton_height)), "color": self.powder_blue})       # Group
-        self.bottons_rect_list.append({"id": "delete", "rect": pygame.Rect((x_pos, y_pos+dist_bottons), (botton_width, botton_height)), "color": self.light_coral})                              # Delete
-        self.bottons_rect_list.append({"id": "clear", "rect": pygame.Rect((x_pos, y_pos+2*dist_bottons), (botton_width, botton_height)), "color": self.light_sky_blue})               # Clean
-        self.bottons_rect_list.append({"id": "start", "rect": pygame.Rect((x_pos, y_pos+3*dist_bottons), (botton_width, botton_height)), "color": self.spring_green})               # Start
+        self.bottons_rect_list.append({"id": "sp", "rect": pygame.Rect((x_pos, y_pos), (50, 50)), "color": self.beige})       # Group
+        self.bottons_rect_list.append({"id": "group", "rect": pygame.Rect((x_pos, y_pos+dist_bottons), (botton_width, botton_height)), "color": self.powder_blue})       # Group
+        self.bottons_rect_list.append({"id": "delete", "rect": pygame.Rect((x_pos, y_pos+2*dist_bottons), (botton_width, botton_height)), "color": self.light_coral})                              # Delete
+        self.bottons_rect_list.append({"id": "clear", "rect": pygame.Rect((x_pos, y_pos+3*dist_bottons), (botton_width, botton_height)), "color": self.light_sky_blue})               # Clean
+        self.bottons_rect_list.append({"id": "start", "rect": pygame.Rect((x_pos, y_pos+4*dist_bottons), (botton_width, botton_height)), "color": self.spring_green})               # Start
         
-        text = self.font_electrodes.render("Group", 1, self.black )
+        text = self.font_electrodes.render("S/P", 1, self.black )
         text_pos = text.get_rect()
-        text_pos.center = ( x_pos+int(botton_width/2), y_pos + int(botton_height/2) )
+        text_pos.center = ( x_pos+int(50/2), y_pos + int(50/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
-        text = self.font_electrodes.render("Delete", 1, self.black )
+        text = self.font_electrodes.render("Group", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos+dist_bottons + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
-        text = self.font_electrodes.render("Clear", 1, self.black )
+        text = self.font_electrodes.render("Delete", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos+2*dist_bottons + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
-        text = self.font_electrodes.render("START", 1, self.black )
+        text = self.font_electrodes.render("Clear", 1, self.black )
         text_pos = text.get_rect()
         text_pos.center = ( x_pos+int(botton_width/2), y_pos+3*dist_bottons + int(botton_height/2) )
+        self.bottons_text_list.append({"text": text, "text_pos": text_pos })
+
+        text = self.font_electrodes.render("START", 1, self.black )
+        text_pos = text.get_rect()
+        text_pos.center = ( x_pos+int(botton_width/2), y_pos+4*dist_bottons + int(botton_height/2) )
         self.bottons_text_list.append({"text": text, "text_pos": text_pos })
 
         # Draw stored numbers (electrodes's ids)
@@ -181,7 +190,14 @@ class Graphics:
 
         # Bottons
         for botton in self.bottons_rect_list:
-            pygame.draw.rect(self.map, botton["color"], botton["rect"] )
+            if botton["id"] == "sp":
+                if self.parallel_flag :
+                    color_sp = botton["color"]
+                else:
+                    color_sp = self.plum
+                pygame.draw.rect(self.map, color_sp, botton["rect"] )
+            else:
+                pygame.draw.rect(self.map, botton["color"], botton["rect"] )
         
         for text_botton in self.bottons_text_list:
             self.map.blit(text_botton["text"], text_botton["text_pos"])
@@ -221,6 +237,8 @@ class Graphics:
                     self.start_botton()
                 elif id_botton == "group" :
                     self.group_botton()
+                elif id_botton == "sp" :
+                    self.sp_botton()
                     
 
     def include_electrodes(self, id):
@@ -230,6 +248,10 @@ class Graphics:
         else:
             self.path_list.append(id)
                 
+
+    def sp_botton(self):
+        
+        self.parallel_flag = not(self.parallel_flag)
 
     def group_botton(self):
         

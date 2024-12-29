@@ -431,14 +431,40 @@ class HV513():
         
         t_list = np.arange(len(self.DATA_list))
         list_data = [self.DATA_list, self.DATA2_list, self.DATA3_list, self.DATA4_list]
-        for i in range(1, 5):
+        # for i in range(1, 5):
             
-            data = list_data[i-1]
+        #     data = list_data[i-1]
 
-            plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
-            plt.legend(['CLK', 'DATA', 'LE'])
-            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(self.data_in_list[i-1])))
-            plt.show() 
+        #     plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+        #     plt.legend(['CLK', 'DATA', 'LE'])
+        #     plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(self.data_in_list[i-1])))
+        #     plt.show() 
+        data = list_data[0]
+        plt.figure()
+        plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+        plt.legend(['CLK', 'DATA', 'LE'])
+        plt.title("HV518 # " + str(1) + " - Input Data = " + str(bin(self.data_in_list[0])))
+
+        data = list_data[1]
+        plt.figure()
+        plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+        plt.legend(['CLK', 'DATA', 'LE'])
+        plt.title("HV518 # " + str(2) + " - Input Data = " + str(bin(self.data_in_list[1])))
+
+        data = list_data[2]
+        plt.figure()
+        plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+        plt.legend(['CLK', 'DATA', 'LE'])
+        plt.title("HV518 # " + str(3) + " - Input Data = " + str(bin(self.data_in_list[2])))
+
+        data = list_data[3]
+        plt.figure()
+        plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+        plt.legend(['CLK', 'DATA', 'LE'])
+        plt.title("HV518 # " + str(4) + " - Input Data = " + str(bin(self.data_in_list[3])))
+
+        plt.show()
+
 
 # Global Package functions
 
