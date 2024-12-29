@@ -66,6 +66,7 @@ class HV513():
         self.DATA3_list = [self.DATA3_val]
         self.DATA4_val = 0b0                 
         self.DATA4_list = [self.DATA4_val]
+        self.data_in_list = []
 
 
 
@@ -225,7 +226,9 @@ class HV513():
         self.CLK_list = [self.CLK_val]              
         self.LE_list = [self.LE_val]               
         self.DATA_list = [self.DATA_val]
+        
         # self.data_in = data_in
+        self.data_in_list = [data_in[0], data_in[1], data_in[2], data_in[3]]
         
         self.DATA2_val = 0b0                 
         self.DATA2_list = [self.DATA2_val]
@@ -434,7 +437,7 @@ class HV513():
 
             plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
             plt.legend(['CLK', 'DATA', 'LE'])
-            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(data[i-1])))
+            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(self.data_in_list[i-1])))
             plt.show() 
 
 # Global Package functions

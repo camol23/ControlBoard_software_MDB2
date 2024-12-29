@@ -25,7 +25,7 @@ for bin_val in output_binary:
     print(bin(bin_val))
 
 virtual.append(output_binary)
-# device_hv513.send_sequence_parallel_debug(virtual)        # Works
+device_hv513.send_sequence_parallel_debug(virtual)        # Works
 
 
 # Testing Sequence
