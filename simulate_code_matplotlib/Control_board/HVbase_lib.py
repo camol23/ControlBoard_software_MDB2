@@ -206,7 +206,7 @@ class HV513():
             self.send_data_parallel_debug(data)
 
             time.sleep(self.time_LE)
-            self.vis_send_debug()        
+            self.vis_send_parallel_debug()        
 
 
     def send_data_parallel_debug(self, data_in):
@@ -424,6 +424,19 @@ class HV513():
         plt.show() 
 
 
+    def vis_send_parallel_debug(self):
+        
+        t_list = np.arange(len(self.DATA_list))
+        list_data = [self.DATA_list, self.DATA2_list, self.DATA3_list, self.DATA4_list]
+        for i in range(1, 5):
+            
+            data = list_data[i-1]
+
+            plt.plot(t_list, self.CLK_list, t_list, data, t_list, self.LE_list)
+            plt.legend(['CLK', 'DATA', 'LE'])
+            plt.title("HV518 # " + str(i) + " - Input Data = " + str(bin(self.data_in[i-1])))
+            plt.show() 
+
 # Global Package functions
 
 
@@ -450,6 +463,40 @@ def map_from_path(points_list):
         output_bin = output_bin | (base_bib << idx)
 
     return output_bin
+
+def map_from_parallel_path(points_list):
+
+    base_bin = 0b1
+    output_bin = [0, 0, 0, 0]
+    
+    for idx in points_list:
+
+        if idx <= 7 :
+            i = 0
+            id = idx
+        elif idx <= 15 :
+            i = 1
+            id = idx - 8
+        elif idx <= 23 :
+            i = 2
+            id = idx - 16
+        elif idx <= 31 :
+            i = 3
+            id = idx - 24
+
+        output_bin[i] = output_bin[i] | (base_bin << id)
+
+    return output_bin
+
+def map_from_parallel_listpath(points_list):
+
+    output_sequence = []
+
+    for points in points_list:
+        output = map_from_parallel_path(points)
+        output_sequence.append(output)
+
+    return output_sequence
 
 
 def map2_inverse_listPath(points_list, num_chips=4):
