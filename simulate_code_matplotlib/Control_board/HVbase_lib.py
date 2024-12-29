@@ -212,6 +212,7 @@ class HV513():
     def send_data_parallel_debug(self, data_in):
         '''
             data_in a list of 4 elements
+            Each element represent one HV518
         '''
 
         # Include turn-on signals-funtion
@@ -224,7 +225,7 @@ class HV513():
         self.CLK_list = [self.CLK_val]              
         self.LE_list = [self.LE_val]               
         self.DATA_list = [self.DATA_val]
-        self.data_in = data_in
+        # self.data_in = data_in
         
         self.DATA2_val = 0b0                 
         self.DATA2_list = [self.DATA2_val]
@@ -233,36 +234,41 @@ class HV513():
         self.DATA4_val = 0b0                 
         self.DATA4_list = [self.DATA4_val]
 
-        data_bit = 0b0
-
+        data1_in = data_in[0]
+        data2_in = data_in[1]
+        data3_in = data_in[2]
+        data4_in = data_in[3]
             
         for i in range(0, 8):                              # Each chip manage 8-bit Input
             # data_bit = data_in & 1                       # Take the first bit
-            self.DATA_val = data_in[0] & 1
-            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
-            self.DATA2_val = data_in[1] & 1
-            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
-            self.DATA_val = data_in & 1
-            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
-            self.DATA_val = data_in & 1
-            self.store_signals(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            self.DATA_val = data1_in & 1
+            self.store_signals_parallel(self.DATA, self.DATA_val)   # Load bit to the GPIO DATA
+            self.DATA2_val = data2_in & 1
+            self.store_signals_parallel(self.DATA2, self.DATA2_val)   # Load bit to the GPIO DATA
+            self.DATA3_val = data3_in & 1
+            self.store_signals_parallel(self.DATA3, self.DATA3_val)   # Load bit to the GPIO DATA
+            self.DATA4_val = data4_in & 1
+            self.store_signals_parallel(self.DATA4, self.DATA4_val)   # Load bit to the GPIO DATA
             
             self.CLK_val = 0b1 
-            self.store_signals(self.CLK, self.CLK_val)      # Load bit to the GPIO CLK 
-            data_in = data_in >> 1                          # shift data to be serialized
+            self.store_signals_parallel(self.CLK, self.CLK_val)      # Load bit to the GPIO CLK 
+            data1_in = data1_in >> 1                          # shift data to be serialized
+            data2_in = data2_in >> 1
+            data3_in = data3_in >> 1
+            data4_in = data4_in >> 1
             
-            time.sleep(self.clk_time)                       # Positive clk semi-cycle                 
+            time.sleep(self.clk_time)                                  # Positive clk semi-cycle                 
             self.CLK_val = 0b0
-            self.store_signals(self.CLK, self.CLK_val)      # Load bit to the GPIO CLK 
-            time.sleep(self.clk_time)                       # Positive clk semi-cycle
+            self.store_signals_parallel(self.CLK, self.CLK_val)        # Load bit to the GPIO CLK 
+            time.sleep(self.clk_time)                                  # Positive clk semi-cycle
         
 
         self.LE_val = 0b1
-        self.store_signals(self.LE, self.LE_val)                # Load bit to the GPIO LE
+        self.store_signals_parallel(self.LE, self.LE_val)                # Load bit to the GPIO LE
 
         time.sleep(self.clk_time)
         self.LE_val = 0b0
-        self.store_signals(self.LE, self.LE_val)                # Load bit to the GPIO LE
+        self.store_signals_parallel(self.LE, self.LE_val)                # Load bit to the GPIO LE
 
 
     def send_data_debug(self, data_in):
@@ -311,6 +317,10 @@ class HV513():
         self.DATA_list.clear()
         self.CLK_list.clear()
         self.LE_list.clear()
+
+        self.DATA2_list.clear()
+        self.DATA3_list.clear()
+        self.DATA4_list.clear()
 
     def store_signals(self, pin, bit_val):
         
