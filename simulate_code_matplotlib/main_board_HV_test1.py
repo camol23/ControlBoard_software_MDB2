@@ -1,5 +1,5 @@
-import HVbase_lib
-import Board_GUI
+from Control_board import HVbase_lib
+from Control_board import Board_GUI
 
 import pygame
 import sys
